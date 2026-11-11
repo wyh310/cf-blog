@@ -1,0 +1,9 @@
+{
+  // 可选：命令行部署（Workers + Static Assets）时使用
+  // 若走「Cloudflare Pages 连 GitHub」路线，这个文件不会被用到
+  "name": "cf-blog",
+  "compatibility_date": "2026-11-10",
+  "assets": {
+    "directory": "./public"
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "name": "cf-blog",
+  "version": "1.0.0",
+  "private": true,
+  "description": "部署到 Cloudflare 的 Hexo 静态博客骨架",
+  "hexo": {
+    "version": "8.1.2"
+  },
+  "scripts": {
+    "build": "hexo generate",
+    "clean": "hexo clean",
+    "server": "hexo server",
+    "new": "hexo new post",
+    "deploy": "wrangler deploy"
+  },
+  "dependencies": {
+    "hexo": "^8.1.2",
+    "hexo-generator-archive": "^2.0.0",
+    "hexo-generator-category": "^2.0.0",
+    "hexo-generator-index": "^4.0.0",
+    "hexo-generator-tag": "^2.0.0",
+    "hexo-renderer-marked": "^7.0.1",
+    "hexo-renderer-pug": "^3.0.0",
+    "hexo-renderer-stylus": "^3.0.1",
+    "hexo-server": "^3.0.0",
+    "hexo-theme-butterfly": "^5.7.2"
+  },
+  "devDependencies": {
+    "wrangler": "^4.159.0"
+  }
+}

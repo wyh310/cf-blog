@@ -1,0 +1,65 @@
+# yaml-language-server: $schema=https://unpkg.com/@sveltia/cms/schema/sveltia-cms.json
+#
+# 在线后台（Sveltia CMS）配置。字段与 scaffolds/post.md 一一对应。
+# 本版图片直接存进 GitHub 仓库：不需要 R2、不需要绑卡、不需要任何密钥。
+# 部署前按 README / 部署文档替换下面标「←」的占位值。
+
+backend:
+  name: github
+  repo: 你的GitHub用户名/cf-blog   # ← 改成你自己的仓库，例如 zhangsan/cf-blog
+  branch: main
+
+# ===== 图片存进仓库 + 拖进去就自动压缩（零配置）=====
+# 后台里点「插入图片」、拖入或粘贴图片时，Sveltia 会把图片文件
+# 一起提交到仓库的 source/images/uploads/，并把链接插到光标处。
+# 不需要 CORS、不需要 Access Key、不需要 Secret Key、不需要付款方式。
+media_folder: source/images/uploads
+public_folder: /images/uploads
+
+# 这是 Sveltia CMS 官方的「上传时自动优化图片」功能（Image Optimization）：
+# 压缩在你浏览器里完成，提交到 GitHub 的已经是压好的小图，大原图从来不会进仓库、
+# 更不会进 Git 历史。手机、电脑、换浏览器都一样生效，不用装软件、不用跑脚本。
+#   · JPEG / PNG / HEIC(iPhone 照片) / WebP → 自动转 WebP、缩到 1600 以内、去掉 EXIF
+#   · 转格式后文件名和文章里插入的链接会自动改成 .webp，不用手动改，不会破图
+#   · 动图（GIF / 动态 WebP / 动态 PNG）保持原样，避免只留第一帧；SVG 只去掉冗余元数据
+#   · 浏览器不能编码 WebP 时会退回 PNG；Safari 上压缩稍慢（用 JS 库代替原生编码）
+# 后台统一按【有损】压；想让截图 / 文字图做到「像素级无损」，用 tools/add-images.sh。
+media_libraries:
+  default:                    # 内置存储（图片进仓库）专用；外置存储才用 all
+    config:
+      # 单张上限 10 MB。注意：这个限制比对的是【压缩后】的文件——Sveltia 先转换再校验，
+      # 静态图压完通常只有几百 KB，其实远不到上限；放宽主要是给不参与压缩的动图 / SVG
+      # 留余量。想更严可以改小，例如 2097152（2 MB）。
+      max_file_size: 10485760
+      transformations:
+        raster_image:          # 适用于 avif / gif / heic / jpeg / png / webp
+          format: webp         # 官方目前只支持转成 webp
+          quality: 80          # 照片质量；嫌不够清晰改 85
+          width: 1600          # 最大宽，只缩不放
+          height: 1600         # 最大高，只缩不放
+        png:                   # 覆盖上面：PNG 多为截图 / 文字 / 图标，用更高质量减少糊边
+          format: webp
+          quality: 95
+          width: 1600
+          height: 1600
+        svg:
+          optimize: true       # 用 SVGO 去掉注释和编辑器元数据
+
+collections:
+  - name: posts
+    label: 文章
+    label_singular: 篇
+    folder: source/_posts
+    create: true
+    extension: md
+    format: yaml-frontmatter
+    # 文件名用「日期-随机串」，中文标题也不会生成中文网址，且不会重名
+    slug: '{{year}}-{{month}}-{{day}}-{{uuid_short}}'
+    fields:
+      - { label: 标题, name: title, widget: string }
+      # 新建时自动填当前时间；格式与 Hexo 现有文章一致
+      - { label: 日期, name: date, widget: datetime, format: 'YYYY-MM-DD HH:mm:ss', default: '{{now}}' }
+      - { label: 标签, name: tags, widget: list, required: false }
+      - { label: 分类, name: categories, widget: list, required: false }
+      - { label: 封面, name: cover, widget: string, required: false, default: '/images/cover.svg', hint: '留默认封面即可；想用自己传的图，在左侧「Asset Library」复制 /images/uploads/xxx.jpg 粘进来' }
+      - { label: 正文, name: body, widget: markdown }

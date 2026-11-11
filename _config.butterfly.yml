@@ -1,0 +1,33 @@
+# Butterfly 主题精简配置：只写要改的，其余全部用主题默认值
+# 完整可选项见 node_modules/hexo-theme-butterfly/_config.yml
+
+menu:
+  首页: / || fas fa-home
+  归档: /archives/ || fas fa-archive
+  标签: /tags/ || fas fa-tags
+  分类: /categories/ || fas fa-folder-open
+
+# 代码块：右上角一键复制 + 显示语言（默认已开，这里显式写死）
+code_blocks:
+  theme: light
+  copy: true
+  language: true
+  height_limit: 400
+  word_wrap: false
+
+# 全文允许复制，不给文章加不可复制限制
+copy:
+  enable: true
+  copyright:
+    enable: false
+
+# 主题自带脚本走本地文件，不依赖外部 CDN
+CDN:
+  internal_provider: local
+
+# 图片懒加载：一篇里图多时，只加载读者当前看到的那几张，往下滚才继续加载。
+# 用浏览器原生 loading="lazy"，不额外引入 JS，也不影响代码块、复制按钮。
+lazyload:
+  enable: true
+  native: true
+  field: site
