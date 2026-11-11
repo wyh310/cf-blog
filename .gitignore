@@ -1,0 +1,9 @@
+node_modules/
+public/
+db.json
+.deploy_git/
+.wrangler/
+.DS_Store
+*.log
+__pycache__/
+*.pyc
