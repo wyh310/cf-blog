@@ -6,7 +6,7 @@
 
 backend:
   name: github
-  repo: 你的GitHub用户名/cf-blog   # ← 改成你自己的仓库，例如 zhangsan/cf-blog
+  repo: wyh310/cf-blog   # ← 改成你自己的仓库，例如 zhangsan/cf-blog
   branch: main
 
 # ===== 图片存进仓库 + 拖进去就自动压缩（零配置）=====
