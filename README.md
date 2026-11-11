@@ -23,7 +23,10 @@
 | `source/images/uploads/` | 正文图片放这里，会随仓库一起发布 |
 | `source/images/cover.svg` | 默认封面 |
 | `tools/add-images.sh`、`tools/add_images.py` | 可选进阶：命令行批量放图并自动压缩（能选像素级无损），打印 Markdown 链接 |
+| `source/admin/vendor/`、`source/vendor/` | 后台主脚本、图标字体、中文语言包、动态分块，以及前台 Font Awesome 的本地副本 |
 | `wrangler.jsonc` | 可选的命令行部署配置 |
+
+> 上面几个 `vendor/` 目录是「资源本地化」用的（合计约 4.1 MB）：官方版本默认从海外 CDN 加载图标字体、中文语言包和动态分块，国内拉不到时，后台图标会退化成 `arrow_back` 这样的英文单词、界面中英混杂、布局被撑歪，前台图标会变成看不懂的空心方块。现在这些都随仓库一起发布，打开站点和后台、登录发文都不再依赖海外 CDN。语言包只留了简体中文，其他语言的浏览器会回退英文界面，不影响功能。平时不用管，只有以后想升级 Sveltia / Font Awesome 时才需要整套替换。
 
 ## 第一次本地跑起来（可选）
 
@@ -50,6 +53,8 @@ git push -u origin main
 5. Save and Deploy。拿到 `xxx.pages.dev` 后，进项目 → **Custom domains** → 填你的域名，自动加解析 + 自动签证书。
 
 > 如果填自定义域时提示该主机名已有记录，先到 Cloudflare DNS 删掉旧的 A / CNAME 记录再填。
+>
+> **网页上传源码时别漏两个隐藏文件**：`.gitignore` 和 `.node-version` 以点开头，Windows 资源管理器 / macOS Finder 默认不显示，「全选拖进上传框」时常常没被选中。漏了 `.node-version` 会让 Pages 用默认 Node 版本、装依赖报错。补法：仓库 → `Add file → Create new file`，文件名照抄带点的 `.gitignore`（内容见源码包）和 `.node-version`（内容就一个 `22`），分别提交；或直接走第 1 步的命令行 `git add -A`，隐藏文件会自动跟着走。
 
 ## 在线后台（可选，手机也能发文）
 
@@ -62,6 +67,8 @@ git push -u origin main
 3. 浏览器打开 `https://你的域名/admin/`，点 **Sign In with Token** 粘贴登录。
 
 > 手机上用同样地址打开，浏览器菜单选「添加到主屏幕」，以后点图标就像 App 一样写文章。别人访问 `/admin` 只会看到登录框，没有你的令牌什么也改不了。
+
+> 登录时若报 `You don't have access to the ... repository`：多半是 `config.yml` 的 `repo` 还留着示例值 `你的GitHub用户名/cf-blog`，或令牌没勾到这个仓库、`Contents` 没给 Read and write。改完**等 Pages 重新构建**，再 `Ctrl+F5` 强制刷新 `/admin/`，不刷新读到的还是旧配置。
 
 **插图不用额外配置，压缩也不用你管**：`config.yml` 里已写好 `media_folder: source/images/uploads` / `public_folder: /images/uploads`，以及 `media_libraries.default.config.transformations`（Sveltia 官方的「上传时自动优化图片」）。后台拖进去的图片会**先在浏览器里转 WebP、缩到 1600 以内、去掉 EXIF**，压好的小图才提交进 GitHub 仓库，文件名和文章里的链接自动改成 `.webp`，不会破图。大原图从没进过仓库、更不会留在 Git 历史里。手机、电脑、换浏览器都一样生效，不用装软件、不用跑命令。不需要任何密钥、不需要 CORS、不需要第二个域名。
 
@@ -121,7 +128,7 @@ Windows 没有 bash 就跑 `python tools/add_images.py ./photos/`。脚本对每
 
 > 图片在仓库里，跟文章绑定在一起：**删了图，文章就会破图**；别随手删。GitHub 只建议仓库 1 GB 以内（5 GB 以内也强烈建议），**不按张数限制**；压成 WebP 后一张 100~200 KB，1 GB 能放几千张。**用后台写文章时图片已自动压好，不用手动压**；只有在 GitHub 网页 / 命令行直接传图，才需要先用 <https://squoosh.app> 把照片转 WebP、质量 80 左右（截图/文字图选「无损」）。Pages 免费额度是无限带宽、500 次构建/月，个人博客远远够。
 >
-> 四个提醒：① **后台拖图自动压缩**（`source/admin/config.yml` 的 `transformations`），单张上限 10 MB、比对的是压缩后的文件，手机 4~8 MB 原图能顺利进来；② 主题已开**图片懒加载**（`_config.butterfly.yml` 的 `lazyload`），一篇文章里图多也只加载读者看到的那几张；③ **照片用质量 80、截图/文字图用无损，压一次就定稿、别反复另存**，压缩不可逆，原图留本地备份（详见部署手册「5.5」）；④ **删图不能给仓库「减肥」**——Git 历史里还留着，详见「附一」。后台压缩的好处正是**大原图一次都没进过历史**，从源头少占地方。
+> 四个提醒：① **后台拖图自动压缩**（`source/admin/config.yml` 的 `transformations`），单张上限 10 MB、比对的是压缩后的文件，手机 4~8 MB 原图能顺利进来；② 主题已开**图片懒加载**（`_config.butterfly.yml` 的 `lazyload`），一篇文章里图多也只加载读者看到的那几张；③ **照片用质量 80、截图/文字图用无损，压一次就定稿、别反复另存**，压缩不可逆，原图留本地备份（详见部署文档文末「速查清单」）；④ **删图不能给仓库「减肥」**——Git 历史里还留着，详见部署文档文末「速查清单」。后台压缩的好处正是**大原图一次都没进过历史**，从源头少占地方。
 
 ## 数据存哪
 
